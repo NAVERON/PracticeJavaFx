@@ -26,29 +26,34 @@ repositories {
         url 'https://maven.aliyun.com/nexus/content/groups/public/' 
         url "https://nexus.gluonhq.com/nexus/content/repositories/releases/" 
     }
-    mavenCentral()
     
     jcenter() 
     // Use the plugin portal to apply community plugins in convention plugins.
     gradlePluginPortal()
 }
 
-
-application {
-    mainModule = "practicefx" 
-    mainClass = 'org.practicefx.LauncherFx'
-}
-
 dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:30.1.1-jre'
-    implementation 'org.slf4j:slf4j-api:1.7.30' 
-    implementation 'org.slf4j:slf4j-simple:1.7.30' 
+    implementation 'org.slf4j:slf4j-api:2.0.0-alpha6' 
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    testImplementation 'org.slf4j:slf4j-simple:2.0.0-alpha6' 
+    
     
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     implementation 'org.apache.commons:commons-lang3:3.12.0' 
     // https://mvnrepository.com/artifact/org.jsoup/jsoup
     implementation group: 'org.jsoup', name: 'jsoup', version: '1.14.3' 
+    // https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.13'
+    // https://mvnrepository.com/artifact/org.eclipse.jetty/jetty-client
+    implementation group: 'org.eclipse.jetty', name: 'jetty-client', version: '11.0.8'
+    // https://mvnrepository.com/artifact/commons-codec/commons-codec
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.15'
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation 'org.json:json:20211205'
+    // https://mvnrepository.com/artifact/org.msgpack/jackson-dataformat-msgpack
+    implementation 'org.msgpack:jackson-dataformat-msgpack:0.9.1'
     
     
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.4.30' 
@@ -60,6 +65,7 @@ dependencies {
     
     testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.1'
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
+    
 }
 
 javafx {
@@ -70,7 +76,6 @@ javafx {
     'javafx.media', 'javafx.web' 
     ]
     
-    mainClass 'org.practicefx.LauncherFx'
 }
 
 eclipse {
@@ -85,6 +90,13 @@ eclipse {
     }
 }
 
+application {
+    mainModule = "practicefx" 
+    
+    mainClass = 'org.practicefx.LauncherFx'
+}
+
+//mainClass = 'org.practicefx.LauncherFx'
 //mainClassName = "$moduleName/org.practicefx.LauncherFx"
 
 

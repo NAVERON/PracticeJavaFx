@@ -1,6 +1,8 @@
 
 package org.practicefx;
 
+import java.util.logging.Logger;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -8,12 +10,15 @@ import javafx.stage.Stage;
 
 public class LauncherFx extends Application {
 	
-	@Override
+	private static final Logger LOGGER = Logger.getLogger(LauncherFx.class.getName());
+	
+	@Override 
 	public void start(Stage primaryStage) throws Exception {
 		// 创建主面板 
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
-		MainController controller = new MainController();
-		loader.setController(controller);
+		//MainController controller = new MainController();
+		//loader.setController(controller);
+		LOGGER.info("primary fxml load success - ");
 		
 		Scene scene = new Scene(loader.load());
 		primaryStage.setScene(scene);

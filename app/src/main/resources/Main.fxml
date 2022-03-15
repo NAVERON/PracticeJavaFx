@@ -1,25 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="686.0" prefWidth="1030.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.practicefx.MainController">
    <left>
-      <VBox prefHeight="686.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <VBox fx:id="userVBox" prefHeight="600.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </left>
    <center>
-      <VBox prefHeight="686.0" prefWidth="200.0" BorderPane.alignment="TOP_LEFT" />
-   </center>
-   <right>
-      <BorderPane prefHeight="686.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-         <top>
-            <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </top>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <left>
+            <VBox fx:id="shipVBox" prefHeight="600.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+         </left>
          <center>
-            <AnchorPane prefHeight="586.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
+            <VBox prefHeight="600.0" prefWidth="450.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox fx:id="controlsHBox" prefHeight="100.0" prefWidth="450.0">
+                     <children>
+                        <Button fx:id="runButton" mnemonicParsing="false" onMouseClicked="#trackRun" prefHeight="50.0" prefWidth="110.0" text="RunShip" />
+                        <Button fx:id="stopButton" mnemonicParsing="false" onMouseClicked="#trackStop" prefHeight="50.0" prefWidth="110.0" text="StopMove" />
+                        <Button fx:id="saveTracksButton" mnemonicParsing="false" onMouseClicked="#trackSave" prefHeight="50.0" prefWidth="110.0" text="SaveTracks" />
+                        <Button fx:id="clearTracksButton" mnemonicParsing="false" onMouseClicked="#trackClear" prefHeight="50.0" prefWidth="110.0" text="ClearTracks" />
+                     </children>
+                  </HBox>
+                  <Pane fx:id="shipTracksCanvas" onMouseDragged="#canvasDraggedMoving" onMousePressed="#canvasClickStart" onMouseReleased="#canvasReleaseStop" prefHeight="500.0" prefWidth="450.0" />
+               </children>
+            </VBox>
          </center>
       </BorderPane>
-   </right>
+   </center>
 </BorderPane>
+
+
+
+
+
+
