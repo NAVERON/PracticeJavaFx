@@ -1,10 +1,20 @@
 package org.practicefx;
 
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+/**
+ * 远程获取 船舶对象属性  以后可以增加更多的 组件美化显示 
+ * @author eron
+ *
+ */
 public class ShipModel extends HBox implements Cloneable {
 
 	private static final Logger LOGGER = Logger.getLogger(ShipModel.class.getName());
@@ -21,15 +31,19 @@ public class ShipModel extends HBox implements Cloneable {
 	private LocalDateTime createTime; // 船舶创建时间 
 	private LocalDateTime updateTime; // 船舶属性修改时间 
 	
+	private MainController mainController;
+	
 	@Deprecated
 	public ShipModel() {  // 禁用
 		this.userId = 0L; 
 		this.name = "NULL";
+		
 	}
 	
 	public ShipModel(Long userId, String name) { 
 		this.userId = userId;
 		this.name = name;
+		
 	}
 	
 	public ShipModel(Builder builder) {
@@ -41,6 +55,44 @@ public class ShipModel extends HBox implements Cloneable {
 		this.type = builder.type;
 		this.electronicType = builder.electronicType;
 		this.draft = builder.draft;
+		
+	}
+	
+	public void customeComponent(MainController mainController) {
+		this.mainController = mainController;
+		
+		this.setOnMouseClicked(e -> {
+			this.mainController.getTimer().stop();
+			this.mainController.setShipId(this.shipId);
+			
+			HttpResponse<String> tracksResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId);
+			String tracksResponseBody = tracksResponse.body();
+			LOGGER.info("track body : " + tracksResponseBody);
+			List<TrackView> tracks = JsonUtil.parseJsonArrayToTracks(JsonUtil.getJsonArray(tracksResponseBody, "data"));
+			LOGGER.info("转换的tracks : " + tracks.toString());
+			
+			// 获取到轨迹点之后 mainontroller 调用Pane 绘制轨迹点 
+			this.mainController.drawShipTracks(tracks);
+		});
+		
+		this.styleProperty().bind(
+				Bindings
+                .when(hoverProperty())
+                .then(new SimpleStringProperty("-fx-background-color: #CE5C00;"))
+                .otherwise(new SimpleStringProperty("-fx-background-color: #F4F4F4;"))
+        );
+		
+		// 设置按钮 
+		Label nameLabel = new Label(this.name);
+		nameLabel.setPrefWidth(200);
+		nameLabel.setPrefHeight(50);
+		
+		Label idLabel = new Label(String.valueOf(this.shipId));
+		idLabel.setPrefWidth(100);
+		idLabel.setPrefHeight(50);
+		
+		this.getChildren().add(nameLabel);
+		this.getChildren().add(idLabel);
 	}
 	
 	/**

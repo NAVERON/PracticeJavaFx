@@ -1,12 +1,15 @@
 package org.practicefx;
 
+import java.math.BigDecimal;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javafx.geometry.Point2D;
 
 /**
- * 轨迹点的属性 
+ * 轨迹点的属性  船舶轨迹点  记录的事件为船舶在某时某克的航行状态 VDR 
  * @author eron
  *
  */
@@ -14,8 +17,6 @@ public class TrackView extends Point2D implements Cloneable {
 
 	private static final Logger LOGGER = Logger.getLogger(TrackView.class.getName());
     
-	// 不需要column注解的情况是 使用大小驼峰命名 如 a_b -> 对象 aB 属性 
-
     private Long trackId; // 自增主键  
 	private Long shipId; // 船舶id @See Ship  必须赋值 
 	private Float rotationAcceleration; // 转向角加速度 
@@ -27,7 +28,7 @@ public class TrackView extends Point2D implements Cloneable {
 	private Float longitude; // 经度 
 	private Float latitude; // 纬度 
 	private LocalDateTime createTime; // 轨迹点创建时间 
-	
+		
 	@Deprecated 
 	public TrackView(Double x, Double y) { 
 		super(x, y);
@@ -57,7 +58,7 @@ public class TrackView extends Point2D implements Cloneable {
 	
 	public static class Builder { 
 		
-		private Double x = 0D;
+		private Double x = 0D;  // 当前暂时默认值 后期修改成真正的值
 		private Double y = 0D;
 		// 以后可以实现快速创建和参数验证 
 		//private Long id; // 自增主键  
@@ -111,10 +112,19 @@ public class TrackView extends Point2D implements Cloneable {
 		}
 		public Builder longitude(Float longitude) {
 			this.longitude = longitude;
+			
+			// 数值转换 注意经度损失   longitude -> x 
+			BigDecimal bigDecimal = new BigDecimal(String.valueOf(longitude));
+			this.x = bigDecimal.doubleValue();
+			
 			return this;
 		}
 		public Builder latitude(Float latitude) {
 			this.latitude = latitude;
+			
+			BigDecimal bigDecimal = new BigDecimal(String.valueOf(latitude));
+			this.y = bigDecimal.doubleValue();
+			
 			return this;
 		}
 		

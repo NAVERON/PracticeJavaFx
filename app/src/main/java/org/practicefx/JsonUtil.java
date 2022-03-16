@@ -8,6 +8,13 @@ import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+
+/**
+ * json 字符串格式化工具  
+ * 手动实现json解析到对象的过程 
+ * @author eron
+ *
+ */
 public class JsonUtil {
 	
 	private static final Logger LOGGER = Logger.getLogger(JsonUtil.class.getName());

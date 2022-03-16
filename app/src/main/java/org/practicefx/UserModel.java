@@ -1,10 +1,20 @@
 package org.practicefx;
 
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.logging.Logger;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
+/**
+ * 请求接口获取的用户对象 封装对象 
+ * @author eron
+ *
+ */
 public class UserModel extends HBox implements Cloneable {
 
 	private static final Logger LOGGER = Logger.getLogger(UserModel.class.getName());
@@ -16,18 +26,22 @@ public class UserModel extends HBox implements Cloneable {
 	private LocalDateTime createTime; // 创建时间
 	private LocalDateTime updateTime; // 最近一次修改属性的时间 
 	
+	private MainController mainController;
+	
 	@Deprecated 
 	public UserModel() {
 		// 默认值处理  一般情况下不使用
 		this.name = "NULL";
 		this.password = "NULL";
 		this.registEmail = "NULL";
+		
 	}
 	
 	public UserModel(String name, String password, String registEmail) {
 		this.name = name;
 		this.password = password;
 		this.registEmail = registEmail;
+		
 	}
 	
 	public UserModel(Builder builder) {
@@ -35,7 +49,57 @@ public class UserModel extends HBox implements Cloneable {
 		this.password = builder.password;
 		this.registEmail = builder.registEmail;
 		
-		// 其他的不要给值，由数据库自动生成
+	}
+	
+	/**
+	 * 传入船舶list的vbox 控制添加和
+	 * @param shipVBox 
+	 */
+	public void customeComponent(MainController mainController) {
+		this.mainController = mainController;
+		
+		this.setOnMouseClicked( e -> {
+			this.mainController.getTimer().stop();
+			// 清空绘制轨迹的面板   手动清除/在绘制图形时会自动清除图形轨迹 
+			this.mainController.clearShipTracks();
+			this.mainController.setUserId(this.userId);
+			
+			// 请求 当前用户的船舶对象 
+			HttpResponse<String> shipsResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "ships/" + this.userId);
+			String shipsResponseBody = shipsResponse.body();
+			List<ShipModel> ships = JsonUtil.parseJsonArrayToShips(JsonUtil.getJsonArray(shipsResponseBody, "data"));
+			
+			LOGGER.info("from user < " + this.userId + " > " + " all ships : " + ships.toString());
+			
+			ships.forEach(ship -> {
+				ship.customeComponent(this.mainController);
+			});
+			
+			// 先清空之前的数据, 再重新显示 
+			this.mainController.shipVBox.getChildren().clear();
+			this.mainController.shipVBox.getChildren().addAll(ships);
+			
+		});
+		
+		this.styleProperty().bind(
+				Bindings
+                .when(hoverProperty())
+                .then(new SimpleStringProperty("-fx-background-color: #43CD80;"))
+                .otherwise(new SimpleStringProperty("-fx-background-color: #F4F4F4;"))
+        );
+		
+		// 设置按钮 
+		Label nameLabel = new Label(this.name);
+		nameLabel.setPrefWidth(100);
+		nameLabel.setPrefHeight(50);
+		
+		Label idLabel = new Label(String.valueOf(this.userId));
+		idLabel.setPrefWidth(100);
+		idLabel.setPrefHeight(50);
+		
+		this.getChildren().add(nameLabel);
+		this.getChildren().add(idLabel);
+		
 	}
 	
 	public static Builder createBuilder() {
