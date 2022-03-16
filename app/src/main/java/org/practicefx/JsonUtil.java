@@ -146,7 +146,7 @@ public class JsonUtil {
     		LocalDateTime createTime = DateTimeUtils.parseStringToLocalDateTime(jsonOne.optString("createTime"));
 
     		TrackView track = TrackView.createBuilder().shipId(shipId).rotationAcceleration(rotation)
-    				.sogSpeed(sogSpeed).cogCource(cogCourse).speed(speed).cource(course)
+    				.sogSpeed(sogSpeed).cogCourse(cogCourse).speed(speed).course(course)
     				.rudder(rudder).longitude(longitude).latitude(latitude).build();
     		track.setTrackId(trackId);
     		track.setCreateTime(createTime);
@@ -171,12 +171,17 @@ public class JsonUtil {
 		LocalDateTime createTime = DateTimeUtils.parseStringToLocalDateTime(trackJson.optString("createTime"));
 
 		TrackView track = TrackView.createBuilder().shipId(shipId).rotationAcceleration(rotation)
-				.sogSpeed(sogSpeed).cogCource(cogCourse).speed(speed).cource(course)
+				.sogSpeed(sogSpeed).cogCourse(cogCourse).speed(speed).course(course)
 				.rudder(rudder).longitude(longitude).latitude(latitude).build();
 		track.setShipId(shipId);
 		track.setCreateTime(createTime);
 		
 		return track;
+    }
+    
+    public static String formatTrackToString(TrackView track) {
+    	JSONObject jsonObject = new JSONObject(track);
+    	return jsonObject.toString();
     }
     
 }

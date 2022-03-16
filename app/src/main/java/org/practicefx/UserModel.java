@@ -63,6 +63,7 @@ public class UserModel extends HBox implements Cloneable {
 			// 清空绘制轨迹的面板   手动清除/在绘制图形时会自动清除图形轨迹 
 			this.mainController.clearShipTracks();
 			this.mainController.setUserId(this.userId);
+			this.mainController.setShipId(-1L);
 			
 			// 请求 当前用户的船舶对象 
 			HttpResponse<String> shipsResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "ships/" + this.userId);

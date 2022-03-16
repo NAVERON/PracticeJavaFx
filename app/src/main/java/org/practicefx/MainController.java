@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import org.checkerframework.common.returnsreceiver.qual.This;
+
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,6 +21,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 
 /**
  * 顶层控制器 实现主要的事件触发动作 
@@ -54,10 +57,22 @@ public class MainController implements Initializable {
 	//private Group shipsGroup = new Group();
 	private Group tracksGroup = new Group();
 	private Group newTracksGroup = new Group();
+	private Group mannualTrackGroup = new Group();
 	
 	// 设置当前进入的用户和船舶id  控制轨迹点记忆按钮的动作 
 	private Long userId = -1L;
 	private Long shipId = -1L;
+	/**
+	 * 实现手动点击单个对象生成轨迹点并 保存至服务端 
+	 * @param event
+	 */
+	// 临时坐标点 
+	private Double startX = -1D;
+	private Double startY = -1D;
+	private Double releaseX = -1D;
+	private Double releaseY = -1D;
+	private Circle tmpCircle;
+	private Line tmpLine;
 	
 	// 随机点生成定时器
 	private AnimationTimer timer;
@@ -70,6 +85,7 @@ public class MainController implements Initializable {
 		
 		this.shipTracksCanvas.getChildren().add(this.tracksGroup);
 		this.shipTracksCanvas.getChildren().add(this.newTracksGroup);
+		this.shipTracksCanvas.getChildren().add(this.mannualTrackGroup);
 		
 		timer = new AnimationTimer() {
 			private long lastUpdate = 0L;
@@ -103,6 +119,7 @@ public class MainController implements Initializable {
 		this.newTracksGroup.getChildren().add(new Circle(newPoint.getX(), newPoint.getY(), 5, Color.DARKGREEN));
 	}
 	
+	// 点击动作 设置当前指向的变量 
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
@@ -123,17 +140,26 @@ public class MainController implements Initializable {
 	public void trackRun(MouseEvent event) {
 		LOGGER.info("runButton click - ");
 
+		if( !trackGenerateEnvCheck() ) {
+			return;
+		}
 		timer.start();
 	}
 	@FXML
 	public void trackStop(MouseEvent event) {
 		LOGGER.info("stopButton click - ");
 		
+		if( !trackGenerateEnvCheck() ) {
+			return;
+		}
 		timer.stop();
 	}
 	@FXML
 	public void trackSave(MouseEvent event) {
 		LOGGER.info("saveTrackButton click - ");
+		if( !trackGenerateEnvCheck() ) {
+			return;
+		}
 		
 		LOGGER.info("假装存储了船舶轨迹, 因为船舶轨迹需要航速航向等信息, 当前只作为测试, 联系到相关的内容即可 ");
 		
@@ -143,20 +169,21 @@ public class MainController implements Initializable {
 	public void trackClear(MouseEvent event) {
 		LOGGER.info("clear Button click - ");
 		
+		if( !trackGenerateEnvCheck() ) {
+			return;
+		}
 		this.newTracksGroup.getChildren().clear();
 	}
-	
 	
 	// 绘制轨迹点的检查 
 	public Boolean trackGenerateEnvCheck() {
 		if( this.userId < 0 || this.shipId < 0 ) {
-			LOGGER.warning("not ste user infomation and ship information !!! ");
+			LOGGER.warning("not set user infomation and ship information !!! ");
 			return false;
 		}
 		
 		return true;
 	}
-	
 	@FXML
 	public void canvasClickStart(MouseEvent event) {
 		if( !trackGenerateEnvCheck() ) {
@@ -164,11 +191,12 @@ public class MainController implements Initializable {
 		}
 		
 		LOGGER.info("event type - " + event.getEventType());
-		Double startX = event.getX();
-		Double startY = event.getY();
-		
+		startX = event.getX();
+		startY = event.getY();
 		LOGGER.info("mouse Clicked Start - " + startX + ", " + startY);
 
+		//tmpCircle = new Circle(startX, startY, 5, Color.MAROON);
+		this.mannualTrackGroup.getChildren().add(new Circle(startX, startY, 5, Color.MAROON));
 	}
 	@FXML 
 	public void canvasDraggedMoving(MouseEvent event) {
@@ -179,8 +207,13 @@ public class MainController implements Initializable {
 		LOGGER.info("mouse event type : " + event.getEventType());
 		Double movingX = event.getX();
 		Double movingY = event.getY();
-		
 		LOGGER.info("mouse Dragging event, moving - " + movingX + ", " + movingY);
+		
+		// 创建方向线  先移除  后重绘
+		this.shipTracksCanvas.getChildren().remove(tmpLine);
+		tmpLine = new Line(startX, startY, movingX, movingY);
+		this.shipTracksCanvas.getChildren().add(tmpLine);
+		
 	}
 	@FXML 
 	public void canvasReleaseStop(MouseEvent event) {
@@ -189,12 +222,24 @@ public class MainController implements Initializable {
 		}
 		
 		LOGGER.info("mouse event type : " + event.getEventType());
-		Double releaseX = event.getX();
-		Double releaseY = event.getY();
+		releaseX = event.getX();
+		releaseY = event.getY();
 		LOGGER.info("mouse canvas released - " + releaseX + ", " + releaseY);
+		
+		// 计算方向/速度默认为0  创建轨迹点视图 移除所有临时对象 
+		Double course = new Point2D(startX, startY).angle(releaseX, releaseY);  // 计算方向角需要检查一下 弧度和角度的区分 
+		TrackView newTrack = TrackView.createBuilder().shipId(this.shipId).rotationAcceleration(0F)
+				.sogSpeed(0F).cogCourse(0F).speed(0F).course(course.floatValue()).rudder(0F)
+				.longitude(startX.floatValue()).latitude(startY.floatValue())
+				.build();
+		
+		HttpResponse<String> trackSaveResponse = HttpClientUtils.httpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, 
+								JsonUtil.formatTrackToString(newTrack) );
+		
+		this.shipTracksCanvas.getChildren().remove(tmpLine);
+		//this.shipTracksCanvas.getChildren().remove(tmpCircle);
 	}
 
-	
 	public void drawShipTracks(List<TrackView> tracks) {
 		if( !trackGenerateEnvCheck() ) {
 			return;
@@ -206,9 +251,14 @@ public class MainController implements Initializable {
 		});
 		
 	}
+	
 	public void clearShipTracks() {
 		this.tracksGroup.getChildren().clear();
 		this.newTracksGroup.getChildren().clear();
+		
+		// 清除临时的圆点 
+		this.mannualTrackGroup.getChildren().clear();
+		
 	}
 }
 

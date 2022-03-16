@@ -17,18 +17,18 @@ public class TrackView extends Point2D implements Cloneable {
 
 	private static final Logger LOGGER = Logger.getLogger(TrackView.class.getName());
     
-    private Long trackId; // 自增主键  
+    private Long trackId; // 自增主键 
 	private Long shipId; // 船舶id @See Ship  必须赋值 
 	private Float rotationAcceleration; // 转向角加速度 
 	private Float sogSpeed; // 对地船舶速度 
 	private Float cogCourse; // 对地航向 
 	private Float speed; // 船速 speed - 流速 = sogSpeed 
-	private Float course; // 船向 cource = cogCource 
+	private Float course; // 船向 course = cogCourse 
 	private Float rudder; // 船舶舵角 
 	private Float longitude; // 经度 
 	private Float latitude; // 纬度 
 	private LocalDateTime createTime; // 轨迹点创建时间 
-		
+	
 	@Deprecated 
 	public TrackView(Double x, Double y) { 
 		super(x, y);
@@ -44,9 +44,9 @@ public class TrackView extends Point2D implements Cloneable {
 		this.shipId = builder.shipId;
 		this.rotationAcceleration = builder.rotationAcceleration;
 		this.sogSpeed = builder.sogSpeed;
-		this.cogCourse = builder.cogCource;
+		this.cogCourse = builder.cogCourse;
 		this.speed = builder.speed;
-		this.course = builder.cource;
+		this.course = builder.course;
 		this.rudder = builder.rudder;
 		this.longitude = builder.longitude;
 		this.latitude = builder.latitude;
@@ -65,9 +65,9 @@ public class TrackView extends Point2D implements Cloneable {
 		private Long shipId; // 船舶id @See Ship  必须赋值 
 		private Float rotationAcceleration = 0F; // 转向角加速度 
 		private Float sogSpeed = 0F; // 对地船舶速度 
-		private Float cogCource = 0F; // 对地航向 
+		private Float cogCourse = 0F; // 对地航向 
 		private Float speed = 0F; // 船速 speed - 流速 = sogSpeed 
-		private Float cource = 0F; // 船向 cource = cogCource 
+		private Float course = 0F; // 船向 course = cogCourse 
 		private Float rudder = 0F; // 船舶舵角 
 		private Float longitude = 0F; // 经度 
 		private Float latitude = 0F; // 纬度 
@@ -94,16 +94,16 @@ public class TrackView extends Point2D implements Cloneable {
 			this.sogSpeed = sogSpeed;
 			return this;
 		}
-		public Builder cogCource(Float cogCource) {
-			this.cogCource = cogCource;
+		public Builder cogCourse(Float cogCourse) {
+			this.cogCourse = cogCourse;
 			return this;
 		}
 		public Builder speed(Float speed) {
 			this.speed = speed;
 			return this;
 		}
-		public Builder cource(Float cource) {
-			this.cource = cource;
+		public Builder course(Float course) {
+			this.course = course;
 			return this;
 		}
 		public Builder rudder(Float rudder) {
@@ -197,12 +197,12 @@ public class TrackView extends Point2D implements Cloneable {
 		this.sogSpeed = sogSpeed;
 	}
 
-	public Float getCogCource() {
+	public Float getCogCourse() {
 		return cogCourse;
 	}
 
-	public void setCogCource(Float cogCource) {
-		this.cogCourse = cogCource;
+	public void setCogCourse(Float cogCourse) {
+		this.cogCourse = cogCourse;
 	}
 
 	public Float getSpeed() {
@@ -213,12 +213,12 @@ public class TrackView extends Point2D implements Cloneable {
 		this.speed = speed;
 	}
 
-	public Float getCource() {
+	public Float getCourse() {
 		return course;
 	}
 
-	public void setCource(Float cource) {
-		this.course = cource;
+	public void setCourse(Float course) {
+		this.course = course;
 	}
 
 	public Float getRudder() {
@@ -256,7 +256,7 @@ public class TrackView extends Point2D implements Cloneable {
 	@Override
 	public String toString() {
 		return "ShipTrackPoint [trackId=" + trackId + ", shipId=" + shipId + ", rotationAcceleration=" + rotationAcceleration
-				+ ", sogSpeed=" + sogSpeed + ", cogCource=" + cogCourse + ", speed=" + speed + ", cource=" + course
+				+ ", sogSpeed=" + sogSpeed + ", cogCourse=" + cogCourse + ", speed=" + speed + ", course=" + course
 				+ ", rudder=" + rudder + ", longitude=" + longitude + ", latitude=" + latitude + ", createTime="
 				+ createTime + "]";
 	}
