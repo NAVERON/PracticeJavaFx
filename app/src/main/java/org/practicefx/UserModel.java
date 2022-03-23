@@ -3,6 +3,10 @@ package org.practicefx;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javafx.beans.binding.Bindings;
@@ -66,11 +70,17 @@ public class UserModel extends HBox implements Cloneable {
 			this.mainController.setShipId(-1L);
 			
 			// 请求 当前用户的船舶对象 
-			HttpResponse<String> shipsResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "ships/" + this.userId);
-			String shipsResponseBody = shipsResponse.body();
+			CompletableFuture<HttpResponse<String>> shipsResponse = HttpClientUtils.asyncHttpGet(CommonConstant.API_PREFIX + "ships/" + this.userId);
+			String shipsResponseBody = "";
+			try {
+				shipsResponseBody = shipsResponse.get(10, TimeUnit.SECONDS).body();
+			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			List<ShipModel> ships = JsonUtil.parseJsonArrayToShips(JsonUtil.getJsonArray(shipsResponseBody, "data"));
 			
-			LOGGER.info("from user < " + this.userId + " > " + " all ships : " + ships.toString());
+			LOGGER.info("from user < " + this.userId + " > \n" + " all ships : " + ships.toString());
 			
 			ships.forEach(ship -> {
 				ship.customeComponent(this.mainController);

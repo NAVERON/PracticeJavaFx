@@ -3,6 +3,10 @@ package org.practicefx;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javafx.beans.binding.Bindings;
@@ -65,8 +69,14 @@ public class ShipModel extends HBox implements Cloneable {
 			this.mainController.getTimer().stop();
 			this.mainController.setShipId(this.shipId);
 			
-			HttpResponse<String> tracksResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId);
-			String tracksResponseBody = tracksResponse.body();
+			CompletableFuture<HttpResponse<String>> tracksResponse = HttpClientUtils.asyncHttpGet(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId);
+			String tracksResponseBody = "";
+			try {
+				tracksResponseBody = tracksResponse.get(10, TimeUnit.SECONDS).body();
+			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			LOGGER.info("track body : " + tracksResponseBody);
 			List<TrackView> tracks = JsonUtil.parseJsonArrayToTracks(JsonUtil.getJsonArray(tracksResponseBody, "data"));
 			LOGGER.info("转换的tracks : " + tracks.toString());

@@ -4,9 +4,11 @@ import java.net.URL;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
-
-import org.checkerframework.common.returnsreceiver.qual.This;
 
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
@@ -81,7 +83,11 @@ public class MainController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		// 请求获取所有用户数据   初始化组件 
 		// 1 请求所有用户 创建用户Hbox 并添加到 userVBox 
-		initialUserInformation();
+		try {
+			initialUserInformation();
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			e.printStackTrace();
+		}
 		
 		this.shipTracksCanvas.getChildren().add(this.tracksGroup);
 		this.shipTracksCanvas.getChildren().add(this.newTracksGroup);
@@ -100,21 +106,19 @@ public class MainController implements Initializable {
 		};
 	}
 	
-	public void initialUserInformation() {
+	public void initialUserInformation() throws InterruptedException, ExecutionException, TimeoutException {
 		// 请求所有用户 并加入组件 
-		HttpResponse<String> usersResponse = HttpClientUtils.httpGet(CommonConstant.API_PREFIX + "users");
-		String usersResponseBody = usersResponse.body();
-		LOGGER.info("用户json : " + usersResponseBody);
+		CompletableFuture<HttpResponse<String>> asyncUsersResponse = HttpClientUtils.asyncHttpGet(CommonConstant.API_PREFIX + "users");
+		String responseBody = asyncUsersResponse.get(10, TimeUnit.SECONDS).body();
 		// 从json中解析用户对象 
-		List<UserModel> users = JsonUtil.parseJsonArrayToUsers(JsonUtil.getJsonArray(usersResponseBody, "data"));
-		
+		List<UserModel> users = JsonUtil.parseJsonArrayToUsers(JsonUtil.getJsonArray(responseBody, "data"));
 		users.forEach(user -> {
 			user.customeComponent(this);
 		});
-		
 		this.userVBox.getChildren().addAll(users);
 	}
-	public void draw2DPoint() {
+	
+	public void draw2DPoint() { // 随机绘制  轨迹点 
 		Point2D newPoint = CommonConstant.randomGenerate2DPoint();
 		this.newTracksGroup.getChildren().add(new Circle(newPoint.getX(), newPoint.getY(), 5, Color.DARKGREEN));
 	}
@@ -216,7 +220,7 @@ public class MainController implements Initializable {
 		
 	}
 	@FXML 
-	public void canvasReleaseStop(MouseEvent event) {
+	public void canvasReleaseStop(MouseEvent event) throws InterruptedException, ExecutionException, TimeoutException {
 		if( !trackGenerateEnvCheck() ) {
 			return;
 		}
@@ -233,8 +237,11 @@ public class MainController implements Initializable {
 				.longitude(startX.floatValue()).latitude(startY.floatValue())
 				.build();
 		
-		HttpResponse<String> trackSaveResponse = HttpClientUtils.httpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, 
+		CompletableFuture<HttpResponse<String>> trackSaveResponse = HttpClientUtils.asyncHttpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, 
 								JsonUtil.formatTrackToString(newTrack) );
+		// 记录返回数据 验证和日志 
+		String body = trackSaveResponse.get(10, TimeUnit.SECONDS).body();
+		LOGGER.warning("create and save ship track ==> " + body);
 		
 		this.shipTracksCanvas.getChildren().remove(tmpLine);
 		//this.shipTracksCanvas.getChildren().remove(tmpCircle);
