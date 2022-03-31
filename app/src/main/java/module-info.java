@@ -19,8 +19,12 @@ module practicefx {
     requires javafx.base;
     requires javafx.media;
     requires javafx.web;
-    
     requires transitive javafx.graphics;
+    
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    // add icon pack modules
+    requires org.kordamp.ikonli.fontawesome;
     
     opens org.practicefx to javafx.fxml;
 	

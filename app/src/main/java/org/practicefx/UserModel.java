@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import org.kordamp.ikonli.javafx.FontIcon;
+
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Label;
@@ -98,9 +100,10 @@ public class UserModel extends HBox implements Cloneable {
                 .then(new SimpleStringProperty("-fx-background-color: #43CD80;"))
                 .otherwise(new SimpleStringProperty("-fx-background-color: #F4F4F4;"))
         );
-		
+				
 		// 设置按钮 
 		Label nameLabel = new Label(this.name);
+		nameLabel.setGraphic(new FontIcon("fa-apple"));
 		nameLabel.setPrefWidth(100);
 		nameLabel.setPrefHeight(50);
 		

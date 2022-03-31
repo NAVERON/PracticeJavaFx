@@ -58,6 +58,9 @@ dependencies {
     
     compile 'org.jetbrains.kotlin:kotlin-stdlib:1.4.30' 
     compile 'com.github.almasb:fxgl:17' 
+    implementation 'org.kordamp.ikonli:ikonli-javafx:12.3.1'
+    // https://mvnrepository.com/artifact/org.kordamp.ikonli/ikonli-fontawesome-pack
+	implementation group: 'org.kordamp.ikonli', name: 'ikonli-fontawesome-pack', version: '12.3.1'
     
     testCompile 'org.junit.jupiter:junit-jupiter-api:5.5.1'
     testCompile "org.testfx:testfx-junit5:4.0.16-alpha"
