@@ -1,4 +1,4 @@
-package org.practicefx;
+package org.practicefx.utils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,6 +7,9 @@ import java.util.logging.Logger;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.practicefx.models.ShipModel;
+import org.practicefx.models.TrackView;
+import org.practicefx.models.UserModel;
 
 
 /**
@@ -129,7 +132,7 @@ public class JsonUtil {
     
     public static List<TrackView> parseJsonArrayToTracks(JSONArray tracksJsonArray){
     	List<TrackView> tracks = new ArrayList<>();
-    	    	
+    	
     	for(int i = 0; i < tracksJsonArray.length(); i++) {
     		JSONObject jsonOne = tracksJsonArray.getJSONObject(i);
     		    		

@@ -10,6 +10,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import org.apache.kafka.clients.producer.Callback;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.practicefx.models.TrackView;
+import org.practicefx.models.UserModel;
+import org.practicefx.utils.GsonUtils;
+import org.practicefx.utils.HttpClientUtils;
+import org.practicefx.utils.JsonUtil;
+import org.practicefx.utils.KafkaUtils;
+
 import javafx.animation.AnimationTimer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -110,6 +119,7 @@ public class MainController implements Initializable {
 		// 请求所有用户 并加入组件 
 		CompletableFuture<HttpResponse<String>> asyncUsersResponse = HttpClientUtils.asyncHttpGet(CommonConstant.API_PREFIX + "users");
 		String responseBody = asyncUsersResponse.get(10, TimeUnit.SECONDS).body();
+		LOGGER.info("初始化结果 ==>" + responseBody);
 		// 从json中解析用户对象 
 		List<UserModel> users = JsonUtil.parseJsonArrayToUsers(JsonUtil.getJsonArray(responseBody, "data"));
 		users.forEach(user -> {
@@ -177,6 +187,8 @@ public class MainController implements Initializable {
 			return;
 		}
 		this.newTracksGroup.getChildren().clear();
+		
+		KafkaUtils.consumTrackForTest();
 	}
 	
 	// 绘制轨迹点的检查 
@@ -236,12 +248,29 @@ public class MainController implements Initializable {
 				.sogSpeed(0F).cogCourse(0F).speed(0F).course(course.floatValue()).rudder(0F)
 				.longitude(startX.floatValue()).latitude(startY.floatValue())
 				.build();
+		LOGGER.info("创建的轨迹点对象 => " + JsonUtil.formatTrackToString(newTrack));  // 使用普通json工具序列化 
 		
-		CompletableFuture<HttpResponse<String>> trackSaveResponse = HttpClientUtils.asyncHttpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, 
-								JsonUtil.formatTrackToString(newTrack) );
+		// 这里可以实现一个service 层, 隔离保存和使用具体方法实现 当前不做改进
+		CompletableFuture<HttpResponse<String>> trackSaveResponse = 
+		        HttpClientUtils.asyncHttpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, JsonUtil.formatTrackToString(newTrack));
 		// 记录返回数据 验证和日志 
 		String body = trackSaveResponse.get(10, TimeUnit.SECONDS).body();
 		LOGGER.warning("create and save ship track ==> " + body);
+		
+		LOGGER.info("发送队列数据...");
+		// kafka队列实现 
+		KafkaUtils.pushTracks(newTrack, new Callback() {
+            @Override
+            public void onCompletion(RecordMetadata metadata, Exception exception) {
+                if(exception != null) {
+                    LOGGER.info("发送消息队列meta ==> " + metadata.topic());
+                    LOGGER.info("发送成功");
+                }else{
+                    LOGGER.severe("发送失败");
+                    LOGGER.severe("error : " + exception.toString());
+                }
+            }
+        });
 		
 		this.shipTracksCanvas.getChildren().remove(tmpLine);
 		//this.shipTracksCanvas.getChildren().remove(tmpCircle);

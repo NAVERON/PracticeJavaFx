@@ -12,7 +12,7 @@ import javafx.geometry.Point2D;
 public class CommonConstant {
 
 	// 接口公共前缀 urlPrefix 
-	public static String API_PREFIX = "http://localhost:8080/api/v1/";
+	public static String API_PREFIX = "http://localhost:8888/api/v1/";
 	
 	public static Point2D randomGenerate2DPoint() {
 		// 450  500 范围内 
@@ -22,4 +22,9 @@ public class CommonConstant {
 		
 		return new Point2D(x, y);
 	}
+	
+	public static String KAFKA_CONNECTION_CONFIG = "localhost:9092";
+	public static String KAFKA_TRACK_TOPIC = "tracks";  // 路径点数据 队列topic 
+	
+	
 }

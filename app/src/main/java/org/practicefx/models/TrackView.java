@@ -1,4 +1,4 @@
-package org.practicefx;
+package org.practicefx.models;
 
 import java.math.BigDecimal;
 import java.net.http.HttpResponse;
@@ -28,6 +28,40 @@ public class TrackView extends Point2D implements Cloneable {
 	private Float longitude; // 经度 
 	private Float latitude; // 纬度 
 	private LocalDateTime createTime; // 轨迹点创建时间 
+	
+	// 临时解决方案 json解析和自动转换部分需要 实践出真知 
+	// 因为转换json的时候会对父类对象属性json 所以创建专门的otd对象内部转换 == 错误排除
+	@Deprecated 
+	private static class TrackOTD {
+	    Long trackId; // 自增主键 
+	    Long shipId; // 船舶id @See Ship  必须赋值 
+	    Float rotationAcceleration; // 转向角加速度 
+	    Float sogSpeed; // 对地船舶速度 
+	    Float cogCourse; // 对地航向 
+	    Float speed; // 船速 speed - 流速 = sogSpeed 
+	    Float course; // 船向 course = cogCourse 
+	    Float rudder; // 船舶舵角 
+	    Float longitude; // 经度 
+	    Float latitude; // 纬度 
+	    LocalDateTime createTime; // 轨迹点创建时间 
+	}
+	@Deprecated 
+	public static TrackOTD transToData(TrackView trackView) {
+	    TrackOTD data = new TrackOTD();
+	    data.trackId = trackView.getTrackId();
+	    data.shipId = trackView.getShipId();
+	    data.rotationAcceleration = trackView.getRotationAcceleration();
+	    data.sogSpeed = trackView.getSogSpeed();
+	    data.cogCourse = trackView.getCogCourse();
+	    data.speed = trackView.getSpeed();
+	    data.course = trackView.getCourse();
+	    data.rudder = trackView.getRudder();
+	    data.longitude = trackView.getLongitude();
+	    data.latitude = trackView.getLatitude();
+	    data.createTime = trackView.getCreateTime();
+	    
+	    return data;
+	}
 	
 	@Deprecated 
 	public TrackView(Double x, Double y) { 

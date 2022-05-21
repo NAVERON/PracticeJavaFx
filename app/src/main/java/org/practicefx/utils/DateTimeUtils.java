@@ -1,4 +1,4 @@
-package org.practicefx;
+package org.practicefx.utils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

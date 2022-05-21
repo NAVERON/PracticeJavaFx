@@ -1,4 +1,4 @@
-package org.practicefx;
+package org.practicefx.models;
 
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
@@ -8,6 +8,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
+
+import org.practicefx.CommonConstant;
+import org.practicefx.MainController;
+import org.practicefx.utils.HttpClientUtils;
+import org.practicefx.utils.JsonUtil;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
