@@ -100,8 +100,10 @@ public class KafkaUtils {
         // 消费队列内容 
         LOGGER.info("消费段获取数据");
         ConsumerRecords<String,String> records = getKafkaConsumer().poll(Duration.ofMillis(100));
+        LOGGER.info("获取到的ercords --> " + records.count());
         records.forEach((x) -> {
-            LOGGER.info("消费段获取到 -> " + x.value());
+            // LOGGER.info("消费段获取到 -> " + x.value().toString());
+            System.out.println("消费数据 ===> " + x.topic() + ", " + x.partition() + ", " + x.offset() + "==" + x.key() + ", " + x.value());
         });
     }
 

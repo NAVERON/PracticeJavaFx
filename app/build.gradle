@@ -38,6 +38,8 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha6' 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     testImplementation 'org.slf4j:slf4j-simple:2.0.0-alpha6' 
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-nop
+    testImplementation group: 'org.slf4j', name: 'slf4j-nop', version: '2.0.0-alpha6'
     
     
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3

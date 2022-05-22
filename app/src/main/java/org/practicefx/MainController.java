@@ -251,18 +251,18 @@ public class MainController implements Initializable {
 		LOGGER.info("创建的轨迹点对象 => " + JsonUtil.formatTrackToString(newTrack));  // 使用普通json工具序列化 
 		
 		// 这里可以实现一个service 层, 隔离保存和使用具体方法实现 当前不做改进
-		CompletableFuture<HttpResponse<String>> trackSaveResponse = 
-		        HttpClientUtils.asyncHttpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, JsonUtil.formatTrackToString(newTrack));
-		// 记录返回数据 验证和日志 
-		String body = trackSaveResponse.get(10, TimeUnit.SECONDS).body();
-		LOGGER.warning("create and save ship track ==> " + body);
+//		CompletableFuture<HttpResponse<String>> trackSaveResponse = 
+//		        HttpClientUtils.asyncHttpPost(CommonConstant.API_PREFIX + "shiptracks/" + this.shipId, JsonUtil.formatTrackToString(newTrack));
+//		// 记录返回数据 验证和日志 
+//		String body = trackSaveResponse.get(10, TimeUnit.SECONDS).body();
+//		LOGGER.warning("create and save ship track ==> " + body);
 		
 		LOGGER.info("发送队列数据...");
 		// kafka队列实现 
 		KafkaUtils.pushTracks(newTrack, new Callback() {
             @Override
             public void onCompletion(RecordMetadata metadata, Exception exception) {
-                if(exception != null) {
+                if(exception == null) {
                     LOGGER.info("发送消息队列meta ==> " + metadata.topic());
                     LOGGER.info("发送成功");
                 }else{
