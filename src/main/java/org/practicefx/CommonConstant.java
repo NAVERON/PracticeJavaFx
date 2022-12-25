@@ -17,8 +17,8 @@ public class CommonConstant {
 	public static Point2D randomGenerate2DPoint() {
 		// 450  500 范围内 
 		Random random = new Random();
-		Double x = random.nextDouble() * 450;
-		Double y = random.nextDouble() * 500;
+		double x = random.nextDouble() * 450;
+		double y = random.nextDouble() * 500;
 		
 		return new Point2D(x, y);
 	}
