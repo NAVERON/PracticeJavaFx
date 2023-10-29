@@ -79,7 +79,6 @@ public class ShipModel extends HBox implements Cloneable {
 			try {
 				tracksResponseBody = tracksResponse.get(10, TimeUnit.SECONDS).body();
 			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			LOGGER.info("track body : " + tracksResponseBody);

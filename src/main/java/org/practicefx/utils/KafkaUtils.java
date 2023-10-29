@@ -33,11 +33,11 @@ public class KafkaUtils {
     
     private static final Logger LOGGER = Logger.getLogger(KafkaUtils.class.getName());
     
-    private static KafkaProducer<String, String> kafkaProducer;
-    private static KafkaConsumer<String, String> kafkaConsumer;
+    private static volatile KafkaProducer<String, String> kafkaProducer;
+    private static volatile KafkaConsumer<String, String> kafkaConsumer;
     
     public static KafkaProducer<String, String> getKafkaProducer() {
-        if(kafkaProducer == null) {
+        if (kafkaProducer == null) {
             synchronized (KafkaUtils.class) {
                 if(kafkaProducer == null) {
                     // 初始化 
@@ -47,16 +47,16 @@ public class KafkaUtils {
                     properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
                     properties.put(ProducerConfig.ACKS_CONFIG, "all");
                     
-                    kafkaProducer = new KafkaProducer<String, String>(properties);
+                    kafkaProducer = new KafkaProducer<>(properties);
                 }
             }
         }
         
-        return kafkaProducer;  // 县城安全, 不需要单例模式也可以直接使用 
+        return kafkaProducer;  // 线程安全, 不需要单例模式也可以直接使用
     }
     
     public static KafkaConsumer<String, String> getKafkaConsumer() {
-        if(kafkaConsumer == null) {
+        if (kafkaConsumer == null) {
             synchronized (KafkaUtils.class) {
                 if(kafkaConsumer == null) {
                     // 初始化 
@@ -67,7 +67,7 @@ public class KafkaUtils {
                     properties.put(ConsumerConfig.GROUP_ID_CONFIG, "xxx");
                     properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
                     
-                    kafkaConsumer = new KafkaConsumer<String, String>(properties);
+                    kafkaConsumer = new KafkaConsumer<>(properties);
                     kafkaConsumer.subscribe(Collections.singleton(CommonConstant.KAFKA_TRACK_TOPIC));
                 }
             }
@@ -82,7 +82,7 @@ public class KafkaUtils {
         // String trackJson = GsonUtils.toJsonString(track);
         String trackJson = JsonUtil.formatTrackToString(track);
         LOGGER.info("轨迹点转换成json  准备发送队列 ==> " + trackJson);
-        ProducerRecord<String, String> record = new ProducerRecord<String, String>(CommonConstant.KAFKA_TRACK_TOPIC, trackJson);  
+        ProducerRecord<String, String> record = new ProducerRecord<>(CommonConstant.KAFKA_TRACK_TOPIC, trackJson);
         LOGGER.info("发送内容 ==" + record.toString());
         // kafka调用必须这中央是获取 保证单例
         Future<RecordMetadata> sendStatus = callback == null 
@@ -107,6 +107,7 @@ public class KafkaUtils {
         });
     }
 
+    // 一般不使用 finalize 销毁class  替换使用其他方式销毁
     @Override
     protected void finalize() throws Throwable {  // 销毁连接 
         getKafkaProducer().close();

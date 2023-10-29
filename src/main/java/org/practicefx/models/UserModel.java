@@ -63,7 +63,7 @@ public class UserModel extends HBox implements Cloneable {
 	
 	/**
 	 * 传入船舶list的vbox 控制添加和
-	 * @param shipVBox 
+	 * @param mainController main controller
 	 */
 	public void customeComponent(MainController mainController) {
 		this.mainController = mainController;
@@ -81,16 +81,13 @@ public class UserModel extends HBox implements Cloneable {
 			try {
 				shipsResponseBody = shipsResponse.get(10, TimeUnit.SECONDS).body();
 			} catch (InterruptedException | ExecutionException | TimeoutException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			List<ShipModel> ships = JsonUtil.parseJsonArrayToShips(JsonUtil.getJsonArray(shipsResponseBody, "data"));
 			
 			LOGGER.info("from user < " + this.userId + " > \n" + " all ships : " + ships.toString());
 			
-			ships.forEach(ship -> {
-				ship.customeComponent(this.mainController);
-			});
+			ships.forEach(ship -> ship.customeComponent(this.mainController));
 			
 			// 先清空之前的数据, 再重新显示 
 			this.mainController.shipVBox.getChildren().clear();
